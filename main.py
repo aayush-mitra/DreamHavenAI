@@ -4,7 +4,7 @@ import google.generativeai as genai
 import json
 import requests
 import pandas as pd
-import flask
+# import flask
 load_dotenv()
 
 key = os.getenv('API_KEY')
@@ -46,4 +46,6 @@ def get_story():
     model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content("Make a creative story from the following data. The data is on a person's dream. Make it creative and no more than 300 words.\n" + data)
     print(response.text)
+
+get_story()
 
