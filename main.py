@@ -4,6 +4,7 @@ import google.generativeai as genai
 import json
 import requests
 import pandas as pd
+import flask
 load_dotenv()
 
 key = os.getenv('API_KEY')
@@ -21,5 +22,28 @@ as_json = json.loads(response1.content)['dream']
 as_json2 = json.loads(response2.content)['dream']
 
 df = pd.read_json(json.dumps([as_json, as_json2]), lines=False)
-print(df)
-print(df['quality'].mean())
+
+def get_overall_analysis():
+    info = ""
+    for col in df.columns[3:-3]:
+        
+        info += f"{col}: {str(df[col].value_counts().to_dict())}" + "\n"
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content("Analyze this person's sleep and dream quality and try to provide insight into what it could mean. You are talking directly to the user. The data is provided in the following format. Each line's first word is the category of information provided, and the subsequent dictionary contains each of the provided responses and their respective frequency. These are dreams on different days for the same person. Please give insight. Make it less than 1000 words, with no intro text like \"The person's sleep and dream quality show a ...\", just start with the feedback. \n" + info)
+    print(response.text)
+
+def get_specific_analysis():
+    data = str(as_json)
+    print(data)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content("Analyze this person's sleep and dream quality and try to provide insight into what it could mean. You are talking directly to the user. This is information on a singular dream for a person.. Please give insight. Make it less than 1000 words, with no intro text like \"The person's sleep and dream quality show a ...\", just start with the feedback. \n" + data)
+    print(response.text)
+
+def get_story():
+    data = str(as_json)
+    print(data)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content("Make a creative story from the following data. The data is on a person's dream. Make it creative and no more than 300 words.\n" + data)
+    print(response.text)
+
